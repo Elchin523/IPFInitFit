@@ -50,18 +50,18 @@ class IPF:
 
         return data
 
-     def create_design_matrix(data, constraints):
+    def create_design_matrix(data, constraints):
         X_columns = set()
         interaction_terms = []
     
         # Identify columns and interaction terms
         for dimension, _ in constraints:
-            if isinstance(dimension, list):
-                interaction_terms.append(dimension)
-            else:
-                X_columns.add(dimension)
+                if isinstance(dimension, list):
+                    interaction_terms.append(dimension)
+                else:
+                    X_columns.add(dimension)
     
-        # Create dummy variables for single-dimensional constraints
+            # Create dummy variables for single-dimensional constraints
         X = pd.get_dummies(data[list(X_columns)], drop_first=False).astype(int)
     
         # Create interaction terms for multi-dimensional constraints
