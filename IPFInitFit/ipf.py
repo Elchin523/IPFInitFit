@@ -91,8 +91,8 @@ class IPF:
         
             # Concatenate the interaction terms with the dummy variables
             X = pd.concat([X, interaction_df], axis=1)
-        X.info()
-        return X
+            X.info()
+            return X
 
     def check_results(self, data_clean, data_weighted, constraints):
         print("\nComparison of totals:")
