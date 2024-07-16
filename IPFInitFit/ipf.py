@@ -74,7 +74,7 @@ class IPF:
             interaction_df = interaction_df[valid_columns]
 
             X = pd.concat([X, interaction_df], axis=1)
-
+        print(X.info())
         return X
 
     def check_results(self, data_clean, data_weighted, constraints):
