@@ -99,6 +99,6 @@ class IPF:
 
             total_diff += np.sum(np.abs(comparison['Diff (After - Target)']))
             total_target_sum += np.sum(target)
-
+        prinT('Test')
         print(f"\nTotal absolute difference: {total_diff}")
         print(f"Average percentage difference: {total_diff / total_target_sum * 100:.4f}%")
