@@ -1,4 +1,3 @@
-
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import MinMaxScaler, PolynomialFeatures
@@ -6,7 +5,7 @@ from sklearn.decomposition import PCA
 
 class IPF:
     def __init__(self):
-        pass
+        self.constraints = None  # Initialize constraints attribute
 
     def adjust_weights(self, data, dimension, target):
         if isinstance(dimension, str):
@@ -28,11 +27,12 @@ class IPF:
         return data
 
     def apply_weighting(self, data, constraints, infer_initial_weights=False, max_iter=100, tol=1e-6):
+        self.constraints = constraints  # Store constraints in the object
         initial_weights = np.ones(len(data))
 
         if infer_initial_weights:
             scaler = MinMaxScaler()
-            X = self.create_design_matrix(data, constraints)
+            X = self.create_design_matrix(data)
             X_scaled = scaler.fit_transform(X)
             pca = PCA(n_components=1)
             X_pca = pca.fit_transform(X_scaled)
@@ -50,12 +50,12 @@ class IPF:
 
         return data
 
-    def create_design_matrix(self, data, constraints):
+    def create_design_matrix(self, data):
         X_columns = set()
         interaction_terms = []
 
         # Identify columns and interaction terms
-        for dimension, _ in constraints:
+        for dimension, _ in self.constraints:
             if isinstance(dimension, list):
                 interaction_terms.append(dimension)
             else:
@@ -84,14 +84,15 @@ class IPF:
             valid_columns = []
             for col in interaction_df.columns:
                 dims_in_col = col.split(' ')
-                if len(set(dims_in_col).intersection(set(term))) == 0:
+                dims_set = set(d.split('_')[0] for d in dims_in_col)
+                if len(dims_set) > 1:
                     valid_columns.append(col)
             
             interaction_df = interaction_df[valid_columns]
             
             # Concatenate the interaction terms with the dummy variables
             X = pd.concat([X, interaction_df], axis=1)
-        X.info()
+        
         return X
 
     def check_results(self, data_clean, data_weighted, constraints):
@@ -116,6 +117,8 @@ class IPF:
 
             total_diff += np.sum(np.abs(comparison['Diff (After - Target)']))
             total_target_sum += np.sum(target)
-        print('Test2')
+
         print(f"\nTotal absolute difference: {total_diff}")
         print(f"Average percentage difference: {total_diff / total_target_sum * 100:.4f}%")
+
+
