@@ -50,7 +50,7 @@ class IPF:
 
         return data
 
-      def create_design_matrix(self, data, constraints):
+    def create_design_matrix(self, data, constraints):
         X_columns = set()
         interaction_terms = []
 
