@@ -50,49 +50,49 @@ class IPF:
 
         return data
 
-    def create_design_matrix(data, constraints):
+      def create_design_matrix(self, data, constraints):
         X_columns = set()
         interaction_terms = []
-    
+
         # Identify columns and interaction terms
         for dimension, _ in constraints:
-                if isinstance(dimension, list):
-                    interaction_terms.append(dimension)
-                else:
-                    X_columns.add(dimension)
-    
-            # Create dummy variables for single-dimensional constraints
+            if isinstance(dimension, list):
+                interaction_terms.append(dimension)
+            else:
+                X_columns.add(dimension)
+        
+        # Create dummy variables for single-dimensional constraints
         X = pd.get_dummies(data[list(X_columns)], drop_first=False).astype(int)
-    
+        
         # Create interaction terms for multi-dimensional constraints
         for term in interaction_terms:
             # Create dummy variables for the interaction terms
             interaction_df = pd.get_dummies(data[term], drop_first=False).astype(int)
-        
+            
             # Generate interaction terms using PolynomialFeatures
             poly = PolynomialFeatures(degree=2, interaction_only=True, include_bias=False)
             interaction_matrix = poly.fit_transform(interaction_df)
-        
+            
             # Generate names for interaction terms
             feature_names = poly.get_feature_names_out(interaction_df.columns)
             interaction_df = pd.DataFrame(interaction_matrix, columns=feature_names)
-        
+            
             # Ensure that interaction_df has the same number of rows as X
             interaction_df.index = X.index
-        
+            
             # Remove interaction terms within the same dimension
             valid_columns = []
             for col in interaction_df.columns:
                 dims_in_col = col.split(' ')
                 if len(set(dims_in_col).intersection(set(term))) == 0:
                     valid_columns.append(col)
-        
+            
             interaction_df = interaction_df[valid_columns]
-        
+            
             # Concatenate the interaction terms with the dummy variables
             X = pd.concat([X, interaction_df], axis=1)
-            X.info()
-            return X
+        X.info()
+        return X
 
     def check_results(self, data_clean, data_weighted, constraints):
         print("\nComparison of totals:")
